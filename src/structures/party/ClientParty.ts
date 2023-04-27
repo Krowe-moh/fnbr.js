@@ -415,6 +415,37 @@ class ClientParty extends Party {
     });
   }
 
+    /**
+   * Updates the party's mnemonic
+   * @param mnemonic The new mnemonic
+   * @throws {PartyPermissionError} The client is not the leader of the party
+   * @throws {EpicgamesAPIError}
+   */
+
+  public async setIsland(mnemonic) {
+    if (!this.me.isLeader) throw new PartyPermissionError();
+    
+    let mnemonicData = {
+      playlistName: 'Playlist_PlaygroundV2',
+    };
+    if (mnemonic) mnemonicData.mnemonic = mnemonic;
+    
+    let data = this.meta.get('Default:PlaylistData_j');
+      data = this.meta.set('Default:PlaylistData_j', {
+        ...data,
+        PlaylistData: {
+          ...data.PlaylistData,
+          ...mnemonicData.playlistName,
+          linkId: {
+            ...mnemonicData,
+          },
+        },
+      });
+      await this.sendPatch({
+        'Default:PlaylistData_j': data,
+      });
+    }
+
   /**
    * Updates the squad fill status of this party
    * @param fill Whether fill is enable or not
